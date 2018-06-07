@@ -2,11 +2,12 @@
 cd `dirname $0`
 
 # Download Mattermost-LDAP
-commit_id=502ae7ecb4ca9ffd93b558185f575f64407ad95a
-curl -OL https://github.com/Crivaledaz/Mattermost-LDAP/archive/${commit_id}.tar.gz
-tar zxvf ${commit_id}.tar.gz
-rm ${commit_id}.tar.gz
-mv Mattermost-LDAP-${commit_id} Mattermost-LDAP
+git clone https://github.com/Crivaledaz/Mattermost-LDAP/
+
+# Create config files
+cp Mattermost-LDAP/config_init.sh.example Mattermost-LDAP/config_init.sh
+cp Mattermost-LDAP/oauth/config_db.php.example Mattermost-LDAP/oauth/config_db.php
+cp Mattermost-LDAP/oauth/LDAP/config_ldap.php.example Mattermost-LDAP/oauth/LDAP/config_ldap.php
 
 # Apply patch
 patch -p0 -d Mattermost-LDAP < Mattermost-LDAP.patch
