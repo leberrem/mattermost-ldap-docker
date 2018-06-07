@@ -5,6 +5,8 @@
 - curl
 - docker
 - docker-compose
+- git
+- patch
 
 ## Install
 
