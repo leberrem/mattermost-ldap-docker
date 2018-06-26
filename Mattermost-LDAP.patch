@@ -1,10 +1,10 @@
 diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
---- init_postgres.sh    2018-06-26 09:30:52.908952249 +0200
-+++ init_postgres.sh    2018-06-26 09:14:25.000000000 +0200
+--- Mattermost-LDAP/init_postgres.sh	2018-06-26 09:30:52.908952249 +0200
++++ Mattermost-LDAP/init_postgres.sh	2018-06-26 09:14:25.000000000 +0200
 @@ -1,7 +1,13 @@
  #!/bin/bash
  #This script need right to become postgres user (so root) and to read/write in httpd directory
-
+ 
 -source config_init.sh
 ++#Client configuration
 ++client_id=${CLIENT_ID}
@@ -13,13 +13,13 @@ diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
 ++grant_types="authorization_code"
 ++scope="api"
 ++user_id=""
-
+ 
  #######################################--Fonctions--###############################################
-
+ 
 @@ -25,34 +31,21 @@
-
+ 
  ###################################################################################################
-
+ 
 -#Welcome Message
 -info "This script will create a new Oauth role and an associated database for Mattermost-LDAP\nTo edit configuration please edit this script before running !\n"
 -warn "SuperUser right must be ask to create the new role and database in postgres\n"
@@ -31,7 +31,7 @@ diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
 -info "Creation of role $oauth_user and database $oauth_db ... (need to be root)"
 -sudo -S -u postgres psql -c "CREATE DATABASE $oauth_db_name;"
 -sudo -S -u postgres psql -c "CREATE USER $oauth_user WITH ENCRYPTED PASSWORD '$oauth_pass';"
--sudo -S -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $oauth_db_name TO $oauth_user;"
+-sudo -S -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $oauth_db_name TO $oauth_user;" 
 -
  #Creating tables for ouath database (use oauth role)
  info "Creation of tables for database $oauth_db (using $oauth_user)"
@@ -47,49 +47,49 @@ diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
 +psql -d $POSTGRES_DB -c "$create_table_oauth_refresh_tokens"
 +psql -d $POSTGRES_DB -c "$create_table_users"
 +psql -d $POSTGRES_DB -c "$create_table_oauth_scopes"
-
+ 
  #Insert new client in the database
  info "Insert new client in the database"
 -psql postgres://$oauth_user:$oauth_pass@$ip:$port/$oauth_db_name -c "$create_client"
 +psql -d $POSTGRES_DB -c "$create_client"
-
+ 
  #Verification
 -psql postgres://$oauth_user:$oauth_pass@$ip:$port/$oauth_db_name -c "SELECT * from oauth_clients WHERE client_id='$client_id';" | grep '(1'
 +psql -d $POSTGRES_DB -c "SELECT * from oauth_clients WHERE client_id='$client_id';" | grep '(1'
-
+ 
  if [ $? ]
  then ok "Client has been created ! Oauth Database is configured.\n"
 diff -r -u Mattermost-LDAP/oauth/config_db.php Mattermost-LDAP/oauth/config_db.php
---- oauth/config_db.php 2018-06-26 09:30:52.914952249 +0200
-+++ oauth/config_db.php 2018-06-26 09:20:00.000000000 +0200
+--- Mattermost-LDAP/oauth/config_db.php	2018-06-26 09:30:52.914952249 +0200
++++ Mattermost-LDAP/oauth/config_db.php	2018-06-26 09:20:00.000000000 +0200
 @@ -1,14 +1,14 @@
  <?php
-
--$port            = 5432;
--$host            = "localhost";
--$name            = "oauth_db";
--$type    = "pgsql";
+ 
+-$port  	  = 5432;
+-$host  	  = "localhost";
+-$name  	  = "oauth_db";
+-$type	  = "pgsql";
 -$username = "oauth";
 -$password = "oauth_secure-pass";
--$dsn     = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port;
+-$dsn	  = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port; 
 +$port      = intval(getenv('DB_PORT'));
 +$host      = getenv('DB_HOST');
 +$name      = getenv('DB_NAME');
-+$type       = "pgsql";
++$type	     = "pgsql";
 ++$username = getenv('DB_USER');
 ++$password = getenv('DB_PASS');
-+$dsn        = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port;
-
++$dsn	     = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port; 
+ 
  /* Uncomment the line below to set date.timezone to avoid E.Notice raise by strtotime() (in Pdo.php)
   * If date.timezone is not defined in php.ini or with this function, Mattermost could return a bad token request error
  */
 -//date_default_timezone_set ('Europe/Paris');
-\ Pas de fin de ligne Ã  la fin du fichier
+\ Pas de fin de ligne à la fin du fichier
 +date_default_timezone_set ('UTC');
-\ Pas de fin de ligne Ã  la fin du fichier
+\ Pas de fin de ligne à la fin du fichier
 diff -r -u Mattermost-LDAP/oauth/LDAP/config_ldap.php Mattermost-LDAP/oauth/LDAP/config_ldap.php
---- oauth/LDAP/config_ldap.php  2018-06-26 09:30:52.915952249 +0200
-+++ oauth/LDAP/config_ldap.php  2018-06-26 09:21:56.000000000 +0200
+--- Mattermost-LDAP/oauth/LDAP/config_ldap.php	2018-06-26 09:30:52.915952249 +0200
++++ Mattermost-LDAP/oauth/LDAP/config_ldap.php	2018-06-26 09:21:56.000000000 +0200
 @@ -1,16 +1,26 @@
  <?php
  // LDAP parameters
@@ -98,12 +98,12 @@ diff -r -u Mattermost-LDAP/oauth/LDAP/config_ldap.php Mattermost-LDAP/oauth/LDAP
 +$hostname = getenv('LDAP_HOST');
 +$port = intval(getenv('LDAP_PORT'));
  $ldap_version = 3;
-
- // Attribute use to identify user on LDAP - ex : uid, mail, sAMAccountName
+ 
+ // Attribute use to identify user on LDAP - ex : uid, mail, sAMAccountName	
 -$search_attribute = "uid";
 +$search_attribute = getenv('LDAP_SEARCH_ATTR');
-
- // variable use in resource.php
+ 
+ // variable use in resource.php 
 -$base = "ou=People,o=Company";
 -$filter = "objectClass=*";
 +$base = getenv('LDAP_BASE_DN');
@@ -112,7 +112,7 @@ diff -r -u Mattermost-LDAP/oauth/LDAP/config_ldap.php Mattermost-LDAP/oauth/LDAP
 +{
 +   $filter = "";
 +}
-
+ 
  // ldap service user to allow search in ldap
 -$bind_dn = "";
 -$bind_pass = "";
