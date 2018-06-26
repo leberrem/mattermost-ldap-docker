@@ -10,7 +10,7 @@ cp Mattermost-LDAP/oauth/config_db.php.example Mattermost-LDAP/oauth/config_db.p
 cp Mattermost-LDAP/oauth/LDAP/config_ldap.php.example Mattermost-LDAP/oauth/LDAP/config_ldap.php
 
 # Apply patch
-patch -p0 -d Mattermost-LDAP < Mattermost-LDAP.patch
+patch -p0 < Mattermost-LDAP.patch
 
 # Move files to Dockerfile folders.
 mv Mattermost-LDAP/oauth app/
