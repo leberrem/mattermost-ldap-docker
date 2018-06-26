@@ -1,18 +1,18 @@
-diff -r -u init_postgres.sh /init_postgres.sh
---- init_postgres.sh    2018-06-06 00:15:18.124749795 +0200
-+++ init_postgres.sh    2018-06-06 00:16:19.658749560 +0200
+diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
+--- Mattermost-LDAP/init_postgres.sh    2018-06-26 09:30:52.908952249 +0200
++++ Mattermost-LDAP/init_postgres.sh    2018-06-26 09:14:25.000000000 +0200
 @@ -1,7 +1,13 @@
  #!/bin/bash
  #This script need right to become postgres user (so root) and to read/write in httpd directory
 
 -source config_init.sh
-+#Client configuration
-+client_id=${CLIENT_ID}
-+client_secret=${CLIENT_SECRET}
-+redirect_uri=${REDIRECT_URI}
-+grant_types="authorization_code"
-+scope="api"
-+user_id=""
+++#Client configuration
+++client_id=${CLIENT_ID}
+++client_secret=${CLIENT_SECRET}
+++redirect_uri=${REDIRECT_URI}
+++grant_types="authorization_code"
+++scope="api"
+++user_id=""
 
  #######################################--Fonctions--###############################################
 
@@ -59,24 +59,26 @@ diff -r -u init_postgres.sh /init_postgres.sh
 
  if [ $? ]
  then ok "Client has been created ! Oauth Database is configured.\n"
-diff -r -u oauth/config_db.php oauth/config_db.php
---- oauth/config_db.php 2018-06-06 00:15:18.132749795 +0200
-+++ oauth/config_db.php 2018-06-06 00:20:45.414748546 +0200
+diff -r -u Mattermost-LDAP/oauth/config_db.php Mattermost-LDAP/oauth/config_db.php
+--- Mattermost-LDAP/oauth/config_db.php 2018-06-26 09:30:52.914952249 +0200
++++ Mattermost-LDAP/oauth/config_db.php 2018-06-26 09:20:00.000000000 +0200
 @@ -1,14 +1,14 @@
  <?php
 
 -$port            = 5432;
 -$host            = "localhost";
 -$name            = "oauth_db";
-+$port            = intval(getenv('DB_PORT'));
-+$host            = getenv('DB_HOST');
-+$name            = getenv('DB_NAME');
- $type    = "pgsql";
+-$type    = "pgsql";
 -$username = "oauth";
 -$password = "oauth_secure-pass";
-+$username = getenv('DB_USER');
-+$password = getenv('DB_PASS');
- $dsn     = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port;
+-$dsn     = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port;
++$port      = intval(getenv('DB_PORT'));
++$host      = getenv('DB_HOST');
++$name      = getenv('DB_NAME');
++$type       = "pgsql";
+++$username = getenv('DB_USER');
+++$password = getenv('DB_PASS');
++$dsn        = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port;
 
  /* Uncomment the line below to set date.timezone to avoid E.Notice raise by strtotime() (in Pdo.php)
   * If date.timezone is not defined in php.ini or with this function, Mattermost could return a bad token request error
@@ -84,9 +86,10 @@ diff -r -u oauth/config_db.php oauth/config_db.php
 -//date_default_timezone_set ('Europe/Paris');
 \ Pas de fin de ligne Ã  la fin du fichier
 +date_default_timezone_set ('UTC');
-diff -r -u oauth/LDAP/config_ldap.php oauth/LDAP/config_ldap.php
---- oauth/LDAP/config_ldap.php  2018-06-06 00:15:31.246749745 +0200
-+++ oauth/LDAP/config_ldap.php  2018-06-06 00:18:21.898749094 +0200
+\ Pas de fin de ligne Ã  la fin du fichier
+diff -r -u Mattermost-LDAP/oauth/LDAP/config_ldap.php Mattermost-LDAP/oauth/LDAP/config_ldap.php
+--- Mattermost-LDAP/oauth/LDAP/config_ldap.php  2018-06-26 09:30:52.915952249 +0200
++++ Mattermost-LDAP/oauth/LDAP/config_ldap.php  2018-06-26 09:21:56.000000000 +0200
 @@ -1,16 +1,26 @@
  <?php
  // LDAP parameters
