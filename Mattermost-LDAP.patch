@@ -6,13 +6,13 @@ diff -r -u Mattermost-LDAP/init_postgres.sh Mattermost-LDAP/init_postgres.sh
  #This script need right to become postgres user (so root) and to read/write in httpd directory
  
 -source config_init.sh
-++#Client configuration
-++client_id=${CLIENT_ID}
-++client_secret=${CLIENT_SECRET}
-++redirect_uri=${REDIRECT_URI}
-++grant_types="authorization_code"
-++scope="api"
-++user_id=""
++#Client configuration
++client_id=${CLIENT_ID}
++client_secret=${CLIENT_SECRET}
++redirect_uri=${REDIRECT_URI}
++grant_types="authorization_code"
++scope="api"
++user_id=""
  
  #######################################--Fonctions--###############################################
  
@@ -76,8 +76,8 @@ diff -r -u Mattermost-LDAP/oauth/config_db.php Mattermost-LDAP/oauth/config_db.p
 +$host      = getenv('DB_HOST');
 +$name      = getenv('DB_NAME');
 +$type	     = "pgsql";
-++$username = getenv('DB_USER');
-++$password = getenv('DB_PASS');
++$username = getenv('DB_USER');
++$password = getenv('DB_PASS');
 +$dsn	     = $type . ":dbname=" . $name . ";host=" . $host . ";port=" . $port; 
  
  /* Uncomment the line below to set date.timezone to avoid E.Notice raise by strtotime() (in Pdo.php)
